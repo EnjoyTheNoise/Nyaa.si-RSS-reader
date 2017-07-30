@@ -3,10 +3,63 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:RSSFeedReader"
+
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="Nyaa.si RSS Reader" Height="388.5" Width="445" ResizeMode="CanMinimize">
     <Grid>
+        <DockPanel HorizontalAlignment="Left" Height="26" LastChildFill="False" VerticalAlignment="Top" Width="410" Margin="11,7,0,0">
+            <Label x:Name="QueryLabel" Content="Search:" Height="26" VerticalAlignment="Top" DockPanel.Dock="Left"/>
+            <TextBox x:Name="QueryTextBox" Height="26" TextWrapping="Wrap" Text="Search for torrents" Width="282" VerticalContentAlignment="Center" DockPanel.Dock="Left" BorderThickness="1,0,0,0" FontStyle="Italic" FontSize="10" Loaded="OnLoad" GotKeyboardFocus="Focused"/>
+            <Button x:Name="SearchBtn" Content="Go" Height="26" VerticalAlignment="Top" Width="80" DockPanel.Dock="Left" Click="SearchBtn_Click"/>
+        </DockPanel>
+        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="26" VerticalAlignment="Top" Width="330" Margin="11,7,0,0"/>
+
+        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="26" Margin="11,38,0,0" VerticalAlignment="Top" Width="330"/>
+        <DockPanel HorizontalAlignment="Left" Height="26" LastChildFill="False" VerticalAlignment="Top" Width="410" Margin="11,38,0,0">
+            <Label x:Name="UrlLabel" Content="RSS Feed:" Height="26" VerticalAlignment="Top" Width="61"/>
+            <Border BorderBrush="{x:Null}">
+                <TextBlock x:Name="TxtUrl"  TextWrapping="Wrap"  Width="269" VerticalAlignment="Center" Margin="0,5" FontStyle="Italic"/>
+            </Border>
+            <Button x:Name="RefBtn" Content="Refresh" Height="26" VerticalAlignment="Top" Width="80" Click="RefBtn_Click" DockPanel.Dock="Left"/>
+        </DockPanel>
         
+        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="241" VerticalAlignment="Top" Width="215" Margin="11,100,0,0">
+            <ListBox x:Name="LstFeedItems" HorizontalAlignment="Left" Height="240" VerticalAlignment="Top" Width="213" DisplayMemberPath="Title.Text" SelectionChanged="Update" BorderThickness="0"/>
+        </Border>
+
+        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="161" Margin="232,100,0,0" VerticalAlignment="Top" Width="190">
+            <Grid HorizontalAlignment="Left" Height="160" VerticalAlignment="Top" Width="188">
+                <DockPanel HorizontalAlignment="Left" Height="40" LastChildFill="False" VerticalAlignment="Top" Width="188">
+                    <Label x:Name="DirectLink" Content="Link:" Height="40" VerticalAlignment="Top" VerticalContentAlignment="Center" DockPanel.Dock="Left" Width="35"/>
+                    <TextBlock x:Name="LinkTextBox" TextWrapping="Wrap" VerticalAlignment="Top" Height="30" DockPanel.Dock="Left" Margin="0,10,0,0">
+                        <Hyperlink NavigateUri="{Binding ElementName=LstFeedItems, Path=SelectedItem.Id}" RequestNavigate="Hyperlink_RequestNavigate">
+                                <Run Text="{Binding ElementName=LstFeedItems, Path=SelectedItem.Id}"/>
+                        </Hyperlink>
+                    </TextBlock>
+                </DockPanel>
+                <DockPanel HorizontalAlignment="Left" Height="30" LastChildFill="False" VerticalAlignment="Top" Width="188" Margin="0,130,0,0">
+                    <Label x:Name="Date" Content="Date:" Height="30" VerticalAlignment="Top" VerticalContentAlignment="Center" DockPanel.Dock="Left" Width="40"/>
+                    <TextBlock x:Name="DateTextBox" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Height="20" Text="{Binding SelectedItem.PublishDate, ElementName=LstFeedItems, StringFormat=\{0:g\}}" DockPanel.Dock="Left" Margin="0,7,0,0"/>
+                </DockPanel>
+                <DockPanel HorizontalAlignment="Left" Height="30" LastChildFill="False" VerticalAlignment="Top" Width="188" Margin="0,70,0,0">
+                    <Label x:Name="Seeders" Content="Seeders:" VerticalContentAlignment="Center" HorizontalAlignment="Left" VerticalAlignment="Top" DockPanel.Dock="Left" Width="75" Height="30"/>
+                    <TextBlock x:Name="SeedersTextBox" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Top" DockPanel.Dock="Left" Height="20" Margin="0,7,0,0"/>
+                </DockPanel>
+                <DockPanel HorizontalAlignment="Left" Height="30" LastChildFill="False" VerticalAlignment="Top" Width="188" Margin="0,100,0,0">
+                    <Label x:Name="Leechers" Content="Leechers:" VerticalContentAlignment="Center" HorizontalAlignment="Left" VerticalAlignment="Top" DockPanel.Dock="Left" Height="30" Width="75"/>
+                    <TextBlock x:Name="LeechersTextBlock" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Top" DockPanel.Dock="Left" Height="20" Margin="0,7,0,0"/>
+                </DockPanel>
+                <DockPanel HorizontalAlignment="Left" Height="30" LastChildFill="False" VerticalAlignment="Top" Width="188" Margin="0,40,0,0">
+                    <Label x:Name="Downloads" Content="Downloads:" VerticalContentAlignment="Center" HorizontalAlignment="Left" VerticalAlignment="Top" Height="30" Width="75"/>
+                    <TextBlock x:Name="DownloadsTextBlock" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="20" Margin="0,7,0,0"/>
+                </DockPanel>
+            </Grid>
+        </Border>
+        
+        <Button x:Name="DlBtn" Content="Download .torrent file" HorizontalAlignment="Left" VerticalAlignment="Top" Width="190" Margin="232,307,0,0" Height="34" Click="DlBtn_OnClick"/>
+
+        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="26" VerticalAlignment="Top" Width="411" Margin="11,69,0,0">
+            <TextBlock x:Name="SelectedItemTitleTextBlock" HorizontalAlignment="Left" TextWrapping="Wrap" Text="{Binding SelectedItem.Title.Text, ElementName=LstFeedItems, StringFormat=\{0:g\}}" VerticalAlignment="Center" Width="410" Height="16" TextAlignment="Center"/>
+        </Border>
     </Grid>
 </Window>

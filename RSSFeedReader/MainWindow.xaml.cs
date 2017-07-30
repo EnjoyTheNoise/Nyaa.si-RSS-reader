@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Xml;
+using System.ServiceModel.Syndication;
+using System.Windows.Media;
+using System.Xml.Linq;
 
 namespace RSSFeedReader
 {
@@ -20,9 +17,101 @@ namespace RSSFeedReader
     /// </summary>
     public partial class MainWindow : Window
     {
+        private string _url = "https://nyaa.si/?page=rss";
+        private SyndicationFeed _feed;
+
         public MainWindow()
         {
             InitializeComponent();
+            CreateFeed();
+        }
+
+        private void RefBtn_Click(object sender, RoutedEventArgs e)
+        {
+            CreateFeed();
+        }
+
+        private void CreateFeed()
+        {
+            try
+            {
+                using (var reader = XmlReader.Create(_url))
+                {
+                    _feed = SyndicationFeed.Load(reader);
+                    if (_feed != null)
+                    {
+                        LstFeedItems.ItemsSource = _feed.Items.Take(11);
+                        TxtUrl.Text = _feed.Title.Text;
+                    }
+                    else
+                    {
+                        MessageBox.Show("RSS feed is empty or not valid.");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Failed to load feed. Check your internet connection.");
+                throw;
+            }
+        }
+
+        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
+            e.Handled = true;
+        }
+
+        private void Update(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count == 0)
+            {
+                SeedersTextBox.Text = null;
+                LeechersTextBlock.Text = null;
+                DownloadsTextBlock.Text = null;
+                return;
+            }
+
+            var item = e.AddedItems[0] as SyndicationItem;
+            if (item == null) return;
+
+            var selectedData = item.ElementExtensions.Where(x => x.OuterName == "seeders").Select(y => y.GetObject<XElement>().Value).ToList();
+            SeedersTextBox.Text = selectedData[0];
+            selectedData = item.ElementExtensions.Where(x => x.OuterName == "leechers").Select(y => y.GetObject<XElement>().Value).ToList();
+            LeechersTextBlock.Text = selectedData[0];
+            selectedData = item.ElementExtensions.Where(x => x.OuterName == "downloads").Select(y => y.GetObject<XElement>().Value).ToList();
+            DownloadsTextBlock.Text = selectedData[0];
+            
+        }
+
+        private void DlBtn_OnClick(object sender, RoutedEventArgs e)
+        {
+            var item = LstFeedItems.SelectedItems[0] as SyndicationItem;
+            if (item != null) Process.Start(item.Links[0].Uri.ToString());
+            e.Handled = true;
+        }
+
+        private void SearchBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (QueryTextBox.Text != null)
+            {
+                _url = "https://nyaa.si/?page=rss&q=" + QueryTextBox.Text + "&c = 0_0 & f = 0";
+            }
+            CreateFeed();
+        }
+
+        private void OnLoad(object sender, RoutedEventArgs e)
+        {
+            QueryTextBox.FontStyle = FontStyles.Italic;
+            QueryTextBox.FontSize = 12;
+            QueryTextBox.Text = "Search for torrents";
+        }
+
+        private void Focused(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            QueryTextBox.FontStyle = FontStyles.Normal;
+            QueryTextBox.FontSize = 12;
+            QueryTextBox.Text = null;
         }
     }
 }
