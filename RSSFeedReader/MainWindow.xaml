@@ -9,7 +9,7 @@
     <Grid>
         <DockPanel HorizontalAlignment="Left" Height="26" LastChildFill="False" VerticalAlignment="Top" Width="410" Margin="11,7,0,0">
             <Label x:Name="QueryLabel" Content="Search:" Height="26" VerticalAlignment="Top" DockPanel.Dock="Left"/>
-            <TextBox x:Name="QueryTextBox" Height="26" TextWrapping="Wrap" Text="Search for torrents" Width="282" VerticalContentAlignment="Center" DockPanel.Dock="Left" BorderThickness="1,0,0,0" FontStyle="Italic" FontSize="10" Loaded="OnLoad" GotKeyboardFocus="Focused"/>
+            <TextBox x:Name="QueryTextBox" Height="26" TextWrapping="Wrap" Text="Search for torrents" Width="282" VerticalContentAlignment="Center" DockPanel.Dock="Left" BorderThickness="1,0,0,0" FontStyle="Italic" FontSize="10" Loaded="OnLoad" GotKeyboardFocus="Focused" KeyUp="QueryTextBox_EnterUp"/>
             <Button x:Name="SearchBtn" Content="Go" Height="26" VerticalAlignment="Top" Width="80" DockPanel.Dock="Left" Click="SearchBtn_Click"/>
         </DockPanel>
         <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="26" VerticalAlignment="Top" Width="330" Margin="11,7,0,0"/>
@@ -24,7 +24,7 @@
         </DockPanel>
         
         <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="241" VerticalAlignment="Top" Width="215" Margin="11,100,0,0">
-            <ListBox x:Name="LstFeedItems" HorizontalAlignment="Left" Height="240" VerticalAlignment="Top" Width="213" DisplayMemberPath="Title.Text" SelectionChanged="Update" BorderThickness="0"/>
+            <ListBox x:Name="LstFeedItems" HorizontalAlignment="Left" Height="240" VerticalAlignment="Top" Width="213" DisplayMemberPath="Title.Text" SelectionChanged="Update" BorderThickness="0" PreviewMouseDown="SelectedItem_PreviewMouseDown"/>
         </Border>
 
         <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="161" Margin="232,100,0,0" VerticalAlignment="Top" Width="190">

@@ -35,6 +35,7 @@ namespace RSSFeedReader
                     if (_feed != null)
                     {
                         LstFeedItems.ItemsSource = _feed.Items.Take(11);
+                        LstFeedItems.FontWeight = FontWeights.Bold;
                         TxtUrl.Text = _feed.Title.Text;
                     }
                     else
@@ -117,6 +118,20 @@ namespace RSSFeedReader
             QueryTextBox.FontStyle = FontStyles.Normal;
             QueryTextBox.FontSize = 12;
             QueryTextBox.Text = null;
+        }
+
+        private void SelectedItem_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.OriginalSource == null) return;
+            var item =
+                ItemsControl.ContainerFromElement(LstFeedItems, e.OriginalSource as DependencyObject) as ListBoxItem;
+            if (item != null) item.FontWeight = FontWeights.Normal;
+        }
+
+        private void QueryTextBox_EnterUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Enter) return;
+            SearchBtn_Click(null, null);
         }
     }
 }
